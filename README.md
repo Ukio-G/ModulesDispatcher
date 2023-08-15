@@ -107,3 +107,5 @@ rm -r $REPO_DIR
 md.registerModuleInfo(TimerModule::ModuleInfo());
 md.instanceModule("TimerModule"); // TimerModule::ModuleInfo().name == "TimerModule"
 ```
+- Add details to README about creting own modules
+- Provide doxygen documentation 
