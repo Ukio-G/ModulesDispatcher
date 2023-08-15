@@ -42,7 +42,7 @@ public:
 
 	void tick() {
 		static int i = 0;
-		std::cout << "tick #" << i++ << std::endl;
+		std::cout << "[TimerModule] tick #" << i++ << std::endl;
 	}
 
 private:

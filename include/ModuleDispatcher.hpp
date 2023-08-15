@@ -57,8 +57,6 @@ public:
 		auto newModuleId = getFreeId();
 		modulePtr->owner = this;
 
-		std::cout << "module " << name << " instances with id = " << newModuleId << std::endl;
-
 		modules[newModuleId] = modulePtr;
 		return newModuleId;
 	}
@@ -82,7 +80,7 @@ public:
 		auto it = modules.find(id);
 		if (it == modules.end())
 			return nullptr;
-		
+
 		auto modulePtr = it->second;
 
 		if (!modulePtr) {

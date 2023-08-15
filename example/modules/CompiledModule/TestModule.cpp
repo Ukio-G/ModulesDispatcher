@@ -9,7 +9,7 @@ void TestModule::init()  {
     if (inited)
         return;
     inited = true;
-    std::cout << "TestModule inited" << std::endl;
+    std::cout << "[TestModule] inited" << std::endl;
 };
 
 void TestModule::initEvents() {

@@ -32,7 +32,6 @@ public:
 	EventLoop(EventLoop&&) noexcept = delete;
 
 	~EventLoop() {
-		std::cout << "Destroy EventLoop" << std::endl;
 		stop();
 		mThread.join();
 	};

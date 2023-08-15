@@ -127,7 +127,6 @@ public:
 		static EventChannel* _instance;
 		if (!_instance)
 			_instance = new EventChannel();
-		std::cout << "[EventChannel] getInstance this: " << _instance << std::endl;
 		return *_instance;
 	}
 
