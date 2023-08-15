@@ -32,22 +32,7 @@ Also, in `example/main.cpp` you can find simple code-example.
 
 ### Configuration example
 
-Example of config.json.
-    - modulesToStart: contains module's names to start
-    - modulesConfiguration: contains pair str:  {json}, where str - event name for configuration handle and {json} - configuration itself. 
-    
-For example 
-```
-"TestModuleConfig" : {
-        "i" : 1,
-        "j" : 2,
-        "k" : 3,
-        "m" : 10
-},
-    ```
-    TestModuleConfig - event name, and corresponding part - configuration for module "TestModule"
-
-
+Example of config.json:
 ```
 {
     "modulesConfiguration" : {
@@ -69,8 +54,20 @@ For example
     ]
 }
 ```
+- modulesToStart: contains module's names to start
+- modulesConfiguration: contains pair str:  {json}, where str - event name for configuration handle and {json} - configuration itself. 
+    
+For example 
+```
+"TestModuleConfig" : {
+        "i" : 1,
+        "j" : 2,
+        "k" : 3,
+        "m" : 10
+},
+```
 
-
+TestModuleConfig - event name, and corresponding part - configuration for module "TestModule"
 ### How to use in my project?
 
 Run bootstrap.sh after git clone:
