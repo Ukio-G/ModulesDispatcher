@@ -36,7 +36,8 @@ Example of config.json.
     - modulesToStart: contains module's names to start
     - modulesConfiguration: contains pair str:  {json}, where str - event name for configuration handle and {json} - configuration itself. 
     
-For example ```
+For example 
+```
 "TestModuleConfig" : {
         "i" : 1,
         "j" : 2,
