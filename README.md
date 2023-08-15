@@ -73,7 +73,7 @@ TestModuleConfig - event name, and corresponding part - configuration for module
 Run bootstrap.sh after git clone:
 ```
 cd <root you project dir>
-https://github.com/Ukio-G/ModulesDispatcher.git
+git clone https://github.com/Ukio-G/ModulesDispatcher.git
 cd ModulesDispatcher
 ./bootstrap.sh
 ```
@@ -81,7 +81,7 @@ cd ModulesDispatcher
 or make script's actions manualy (However, the project will still need to be cloned)
 ```
 cd <root you project dir>
-https://github.com/Ukio-G/ModulesDispatcher.git
+git clone https://github.com/Ukio-G/ModulesDispatcher.git
 cd ModulesDispatcher
 
 mkdir -p include/modules
