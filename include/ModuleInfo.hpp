@@ -3,12 +3,26 @@
 
 #include <string>
 
-struct ModuleInfo {
-	uint id;
-	std::string moduleName;
+class IModule;
 
-	bool operator<(const ModuleInfo & other) const { return id < other.id;}
-	bool operator<(ModuleInfo & other) { return id < other.id;}
+struct ModuleInfo {
+    typedef IModule*(*ConstructorPtr)();
+    
+    ModuleInfo() {}
+
+    ModuleInfo(const ModuleInfo& other) : 
+        moduleName(other.moduleName), 
+        constructior(other.constructior) 
+        { }
+
+    ModuleInfo(const std::string & name, ConstructorPtr constructorPtr) : 
+        moduleName(name), 
+        constructior(constructorPtr) 
+        { }
+
+    std::string moduleName;
+	ConstructorPtr constructior;
 };
+
 
 #endif

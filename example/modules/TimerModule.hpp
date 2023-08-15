@@ -1,23 +1,57 @@
 #ifndef MODULE_APP_TIMERMODULE_HPP
 #define MODULE_APP_TIMERMODULE_HPP
 
+#include <any>
 #include <iostream>
+#include "EventLoop.hpp"
 #include "IModule.hpp"
 #include "EventChannel.hpp"
+#include "ModuleInfo.hpp"
+#include "json.hpp"
+
+class TimerModuleInfo;
 
 class TimerModule: public IModule {
 public:
-	TimerModule() {
-		myLoop.addFunction<ECP_ENDLESS>([this]() {tick();});
+	TimerModule() : IModule("TimerModule") { initEvents(); };
+	using ModuleInfo = TimerModuleInfo;
+
+	void initEvents() {
+		if (eventsInited)
+        	return;
+		subscriber->addActionToTopic(getConfigurationEventName(), "UpdateTicks", [this](std::any data) {
+        	auto config = std::any_cast<nlohmann::json>(data);
+			myLoop->setSleepTimeMS(config["tickInterval"]);
+		});
+		EventChannel::getInstance().subscribe(getConfigurationEventName(), subscriber);
 	}
 
-	~TimerModule() { }
+	void init() {
+		if (inited)
+        	return;
+		myLoop = new EventLoop();
+	}
+
+	void start() {
+		myLoop->addFunction<ECP_ENDLESS>([this]() {tick();});
+	}
+
+	~TimerModule() {
+		delete myLoop;
+	 }
 
 	void tick() {
-		std::cout << "tick" << std::endl;
+		static int i = 0;
+		std::cout << "tick #" << i++ << std::endl;
 	}
+
 private:
-	 EventLoop myLoop;
+	 EventLoop *myLoop = nullptr;
+};
+
+class TimerModuleInfo : public ModuleInfo {
+	public:
+	TimerModuleInfo() : ModuleInfo("TimerModule", []() -> IModule* {return new TimerModule();}) { }
 };
 
 #endif //MODULE_APP_TIMERMODULE_HPP

@@ -3,6 +3,7 @@
 //
 #pragma once
 #include <functional>
+#include <iostream>
 #include <unistd.h>
 #include <condition_variable>
 #include <thread>
@@ -25,18 +26,20 @@ class EventLoop final
 public:
 	using function_type = std::function<void()>;
 	using EventType = std::pair<EventId<std::string>, std::function<void()>>;
-	EventLoop() = default;
+	EventLoop() : mThread(&EventLoop::start, this) {	}
+
 	EventLoop(const EventLoop&) = delete;
 	EventLoop(EventLoop&&) noexcept = delete;
 
 	~EventLoop() {
+		std::cout << "Destroy EventLoop" << std::endl;
 		stop();
 		mThread.join();
 	};
 
 	std::vector<function_type>	mFunctions;
 	std::vector<function_type>	mFunctionsRegular;
-	std::thread					mThread{&EventLoop::start, this};
+	std::thread					mThread;
 	std::mutex					mMutex;
 
 	void stop() {
@@ -71,8 +74,9 @@ private:
 					mFunctions.clear();
 				}
 			}
-			for (auto &f: local_deq)
+			for (auto &f: local_deq) {
 				f();
+			}
 			local_deq.clear();
 			usleep(mSleepTimeMS * 1000);
 		}

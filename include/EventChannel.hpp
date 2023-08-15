@@ -21,6 +21,7 @@ public:
 	using ActionsType = std::function<void(ActionArgument)>;
 
 	Subscriber() = delete;
+	Subscriber(const Subscriber& other) = delete;
 	Subscriber(const std::string &name) : _name(name) { }
 
 
@@ -126,6 +127,7 @@ public:
 		static EventChannel* _instance;
 		if (!_instance)
 			_instance = new EventChannel();
+		std::cout << "[EventChannel] getInstance this: " << _instance << std::endl;
 		return *_instance;
 	}
 
@@ -134,7 +136,7 @@ public:
 	EventChannel& operator=(const EventChannel&) = delete;
 private:
 	EventLoop notifyLoop;
-	EventChannel() { }
+	EventChannel() : notifyLoop(){ }
 	std::unordered_map<std::string, std::vector<Subscriber::Ptr>> _subscribedToTopics;
 };
 #endif

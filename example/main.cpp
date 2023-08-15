@@ -1,20 +1,44 @@
+#include "EventChannel.hpp"
 #include "ModuleDispatcher.hpp"
-#include "example/modules/PrinterModule.hpp"
+#include "ModuleInfo.hpp"
 #include "example/modules/TimerModule.hpp"
 #include <unistd.h>
 
 int main() {
+	ModuleDispatcher md;
 
-	ModuleDispatcher dispatcher;
-	auto printer_id = dispatcher.instanceModule<PrinterModule>("Printer");
-	auto timer_id = dispatcher.instanceModule<TimerModule>("Timer");
+	// Load configurations about modules (see config.json for details)
+	md.loadConfigurations("./config.json");
 
-	sleep(1);
+	// Register module from ModuleInfo (used compile-time registration)
+	md.registerModuleInfo(TimerModule::ModuleInfo());
 
-	dispatcher.destroyModule(timer_id);
+	// Load and register module from file (runtime registrations)
+	md.loadModuleFromShared("./libTestModule.so");
+	
+	// Allocate memory for modules (instancing)
+	md.instanceModulesFromConfig();
 
-	sleep(2);
+	// Initialization modules events
+	// (including events that accept and process configurations, so do not neglect this stage)
+	md.initModulesEvents();
 
-	dispatcher.destroyModule(printer_id);
+	// Send readed from config.json configurations to EventChannel
+	md.pushConfigToModules();
+
+	// Init modules (run init() method on modules)
+	md.initModules();
+
+	// Start modules (run start() method on modules)
+	md.startModules();
+
+	sleep(5);
+
+	md.destroyModule(0);
+	md.destroyModule(1);
+
+	sleep(3);
+
+
 	return 0;
 }
