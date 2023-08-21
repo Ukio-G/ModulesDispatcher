@@ -29,6 +29,8 @@ int main() {
 	// Init modules (run init() method on modules)
 	md.initModules();
 
+	md.configureModules();
+
 	// Start modules (run start() method on modules)
 	md.startModules();
 

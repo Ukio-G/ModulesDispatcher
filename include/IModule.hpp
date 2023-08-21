@@ -3,7 +3,11 @@
 
 #include "EventChannel.hpp"
 #include "ModuleInfo.hpp"
+#include "json.hpp"
+#include <chrono>
 #include <string>
+#include <thread>
+#include <future>
 
 class ModuleDispatcher;
 
@@ -38,6 +42,7 @@ public:
 	virtual void initEvents() = 0;
 
 	// Optional interface
+	virtual void configure() {};
 	virtual void start() {};
 	virtual void pause() {};
 	virtual void stop() {};
@@ -50,6 +55,47 @@ public:
 	
 	EModuleStatus getStatus() {
 		return status;
+	}
+
+	void waitStatus(EModuleStatus waitStatus) {
+		while (status != waitStatus) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		}
+	}
+
+	void waitInitializeDone() {
+		while (!inited) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		}
+	}
+
+	void waitEventsInitializeDone() {
+		while (!eventsInited) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		}
+	}
+
+	void waitConfigurationDone() {
+		while (!configured) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		}
+	}
+
+	void waitConfigurationReceived() {
+		while (config.empty()) {
+			std::cout << "Wait config" << std::endl;
+			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		}
+	}
+
+	void waitConfigurationCondition(std::function<bool()> f) {
+		auto a3 = std::async(std::launch::async, [this, f]()->void {
+			while(!f()) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(50));
+			}
+			configured = true;
+		});
+		a3.wait();
 	}
 
 protected:
@@ -65,6 +111,7 @@ protected:
 
 	ModuleDispatcher * owner;
 	std::string name;
+	nlohmann::json config;
 	EModuleStatus status = EMS_UNDEFINED;
 
 	// Used for one-time initialization

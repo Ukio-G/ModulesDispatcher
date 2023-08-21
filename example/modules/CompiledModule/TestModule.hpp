@@ -13,7 +13,7 @@ class TestModule : public IModule {
 	void init();
 	void initEvents();
     void start();
-
+    void configure();
     private:
     int m = 0;
 };

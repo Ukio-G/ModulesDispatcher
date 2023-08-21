@@ -8,7 +8,6 @@
 void TestModule::init()  {
     if (inited)
         return;
-    inited = true;
     std::cout << "[TestModule] inited" << std::endl;
 };
 
@@ -20,19 +19,25 @@ void TestModule::initEvents() {
     EventChannel::getInstance().subscribe(getConfigurationEventName(), subscriber); 
 
     subscriber->addActionToTopic(getConfigurationEventName(), "UpdateM", [this](std::any data){
-        auto config = std::any_cast<nlohmann::json>(data);
-        m = config["m"];
-        configured = true;
+        sleep(2); // simulating a configuration receive delay
+        config = std::any_cast<nlohmann::json>(data);
+        inited = true;
     });
+
     eventsInited = true;
 }
 
+void TestModule::configure() {
+    waitConfigurationCondition([this](){
+        return !(config.empty());
+    });
+    m = config["m"];
+    configured = true;
+}
+
 void TestModule::start() {
-    while (!configured) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    }
-    std::cout << "[TestModule] start" << std::endl;
-    std::cout << "[TestModule] M value = " << m << std::endl;
+    waitConfigurationDone();
+    std::cout << "[TestModule] started with M value = " << m << std::endl;
 }
 
 extern "C" {

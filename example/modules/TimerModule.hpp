@@ -20,19 +20,23 @@ public:
 		if (eventsInited)
         	return;
 		subscriber->addActionToTopic(getConfigurationEventName(), "UpdateTicks", [this](std::any data) {
+			waitInitializeDone();
         	auto config = std::any_cast<nlohmann::json>(data);
 			myLoop->setSleepTimeMS(config["tickInterval"]);
 		});
 		EventChannel::getInstance().subscribe(getConfigurationEventName(), subscriber);
+		eventsInited = true;
 	}
 
 	void init() {
 		if (inited)
         	return;
 		myLoop = new EventLoop();
+		inited = true;
 	}
 
 	void start() {
+		waitConfigurationDone();
 		myLoop->addFunction<ECP_ENDLESS>([this]() {tick();});
 	}
 
@@ -40,13 +44,17 @@ public:
 		delete myLoop;
 	 }
 
+	void configure() {
+		configured = true;
+	}
+
 	void tick() {
 		static int i = 0;
 		std::cout << "[TimerModule] tick #" << i++ << std::endl;
 	}
 
 private:
-	 EventLoop *myLoop = nullptr;
+	EventLoop *myLoop = nullptr;
 };
 
 class TimerModuleInfo : public ModuleInfo {

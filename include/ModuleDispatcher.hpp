@@ -143,6 +143,12 @@ public:
 		}
 	}
 
+	void configureModules() {
+		for (auto &[id, module] : modules) {
+			module->configure();
+		}
+	}
+
 	void startModules() {
 		for (auto &[id, module] : modules) {
 			module->start();
