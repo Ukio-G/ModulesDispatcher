@@ -83,7 +83,6 @@ public:
 
 	void waitConfigurationReceived() {
 		while (config.empty()) {
-			std::cout << "Wait config" << std::endl;
 			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		}
 	}
