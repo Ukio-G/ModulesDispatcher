@@ -1,0 +1,3 @@
+[submodule "submodules/EventChannel"]
+	path = submodules/EventChannel
+	url = git@github.com:Ukio-G/EventChannel.git
