@@ -1,111 +1,67 @@
-## Modules dispatcher
+## ModulesDispatcher
 
-### Synopsis 
-Lightweight header-only construction, allows you to wrap you components and re-organize application to modules composition.
+Minimal include-only C++ library for event-driven module orchestration.
 
-EventChannel and EventLoop provides event driven design for modules communication.
+## Include Style
 
-Supported loading modules from shared libraries (tested with GCC compiler)
-
-### How to use
-- Create module - wrapper for you component. It's just a class inherited from `IModule` class.
-- Include ModuleDispatcher.hpp, create ModuleDispatcher object and instance module: 
-```c++
-ModuleDispatcher md;
-
-// Load configurations about modules (see config.json for details)
-md.loadConfigurations("./config.json");
-
-// Register module from ModuleInfo (used compile-time registration)
-md.registerModuleInfo(TimerModule::ModuleInfo());
-
-// Load and register module from file (runtime registrations)
-md.loadModuleFromShared("./libTestModule.so");
+```cpp
+#include <ModuleDispatcher/ModuleDispatcher.hpp>
+#include <ModuleDispatcher/IModule.hpp>
+#include <ModuleDispatcher/ModuleInfo.hpp>
 ```
-- Implement some events in you `Module` for communicating with other modules.
-- After all, you are able to destroy you module:
-```c++
-md.destroyModule(id);
+
+## Quick Integration (Recommended)
+
+1. Add this repository into your project, for example:
+
+```text
+MyApp/
+  CMakeLists.txt
+  src/main.cpp
+  external/ModulesDispatcher/
 ```
-Also, in `example/main.cpp` you can find simple code-example.
 
+2. In your project `CMakeLists.txt`:
 
-### Configuration example
+```cmake
+cmake_minimum_required(VERSION 3.16)
+project(MyApp LANGUAGES CXX)
 
-Example of config.json:
+add_executable(my_app src/main.cpp)
+target_compile_features(my_app PRIVATE cxx_std_17)
+
+add_subdirectory(external/ModulesDispatcher)
+
+target_include_directories(my_app PRIVATE
+  ${ModulesDispatcher_INCLUDE_DIR}
+)
 ```
-{
-    "modulesConfiguration" : {
-        "TestModuleConfig" : {
-            "i" : 1,
-            "j" : 2,
-            "k" : 3,
-            "m" : 10
-        },
 
-        "TimerModuleConfig" : {
-            "tickInterval" : 100
-        }
-    },
+3. In your `src/main.cpp`:
 
-    "modulesToStart" : [
-        "TestModule",
-        "TimerModule"
-    ]
+```cpp
+#include <ModuleDispatcher/ModuleDispatcher.hpp>
+#include <ModuleDispatcher/IModule.hpp>
+#include <ModuleDispatcher/ModuleInfo.hpp>
+
+int main() {
+    ModuleDispatcher md;
+    return 0;
 }
 ```
-- modulesToStart: contains module's names to start
-- modulesConfiguration: contains pair str:  {json}, where str - event name for configuration handle and {json} - configuration itself. 
-    
-For example 
-```
-"TestModuleConfig" : {
-        "i" : 1,
-        "j" : 2,
-        "k" : 3,
-        "m" : 10
-},
+
+4. Build:
+
+```bash
+cmake -S . -B build
+cmake --build build
 ```
 
-TestModuleConfig - event name, and corresponding part - configuration for module "TestModule"
-### How to use in my project?
+## Update
 
-Run bootstrap.sh after git clone:
+If vendored inside your project:
+
+```bash
+cd external/ModulesDispatcher
+git pull
 ```
-cd <root you project dir>
-git clone https://github.com/Ukio-G/ModulesDispatcher.git
-cd ModulesDispatcher
-./bootstrap.sh
-```
-
-or make script's actions manualy (However, the project will still need to be cloned)
-```
-cd <root you project dir>
-git clone https://github.com/Ukio-G/ModulesDispatcher.git
-cd ModulesDispatcher
-
-mkdir -p include/modules
-mv include/* include/modules
-mv include ..
-
-# Remove examples and other unusable stuff
-
-REPO_DIR=`pwd`
-cd ..
-rm -r $REPO_DIR
-```
-
-### Dependencies
-
-- https://github.com/nlohmann/json - for parsing configuration's files
-
-### ToDo
-- (Done!) Loading modules from json file
-- (Done by ModuleInfo) Append string pseudonym for modules. Something like `using NamedModuleConstuctor = std::pair<std::string, std::function<IModule*()>` returned from static module function. `ModuleDispatcher` shall collect `NamedModuleConstuctor` instances and create new object, inherited from `IModule` based on passed `std::string` key:
-```c++
-// Register module from ModuleInfo (used compile-time registration)
-md.registerModuleInfo(TimerModule::ModuleInfo());
-md.instanceModule("TimerModule"); // TimerModule::ModuleInfo().name == "TimerModule"
-```
-- Add details to README about creting own modules
-- Provide doxygen documentation 
