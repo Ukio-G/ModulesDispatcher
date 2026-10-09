@@ -26,7 +26,10 @@ class ModuleDispatcher
 {
 public:
 	ModuleDispatcher() { }
-	~ModuleDispatcher() { }
+	~ModuleDispatcher() {
+		stopModules();
+		destroyModules();
+	}
 
 	// Make sure modules loaded this way have been compiled with the -rdynamic flag (GCC)
 	ModuleInfo loadModuleFromShared(const std::string & filename) {
@@ -100,6 +103,13 @@ public:
 
 		delete moduleIt->second;
 		modules.erase(moduleIt);
+	}
+
+	void destroyModules() {
+		for (auto moduleIt = modules.rbegin(); moduleIt != modules.rend(); ++moduleIt)
+			delete moduleIt->second;
+
+		modules.clear();
 	}
 
     void registerModuleInfo(const ModuleInfo & moduleInfo) {

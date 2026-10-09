@@ -21,7 +21,8 @@ public:
 	EventLoop(EventLoop&&) noexcept = delete;
 	~EventLoop() {
 		stop();
-		mThread.join();
+		if (mThread.joinable())
+			mThread.join();
 	};
 
 	std::vector<function_type>	mFunctions;
@@ -30,7 +31,7 @@ public:
 	std::mutex					mMutex;
 
 	void stop() {
-		mWorking = false;
+		mWorking.store(false);
 	}
 	template <int T>
 	void addFunction(const function_type& func) {
@@ -39,7 +40,8 @@ public:
 	}
 
 	void join() {
-		mThread.join();
+		if (mThread.joinable())
+			mThread.join();
 	}
 
 	void setSleepTimeMS(unsigned long long ms) {
@@ -47,12 +49,12 @@ public:
 	}
 
 private:
-	bool mWorking = true;
+	std::atomic_bool mWorking{true};
 	unsigned long long mSleepTimeMS = 50;
 
 	std::vector<function_type> local_deq;
 	void start() {
-		while (mWorking) {
+		while (mWorking.load()) {
 			{
 				std::lock_guard<std::mutex> lock(mMutex);
 				local_deq.insert(local_deq.end(), mFunctionsRegular.begin(), mFunctionsRegular.end());
